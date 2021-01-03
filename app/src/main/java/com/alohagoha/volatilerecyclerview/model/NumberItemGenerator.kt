@@ -4,21 +4,33 @@ import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 import kotlin.random.Random
 
 object NumberItemGenerator {
-    var acc: Int = 0
+    private val curList: MutableList<NumberItem> = MutableList(15) { getNumberedItem() }
+    private var acc: Int = 0
     fun getNumberedItem() = NumberItem(acc++)
 
-    fun getStartNumberedList(size: Int): List<NumberItem> =
-        List(size) { getNumberedItem() }
+    fun getStartNumberedList(): List<NumberItem> = curList
 
 //    fun getStartState(size: Int): OperationState = OperationState(getStartNumberedList(15))
 
-    fun addRandomPosition(oldList: List<NumberItem>): List<NumberItem> {
-        Random.Default.nextInt(oldList.size + 1).let { position ->
-            return oldList.toMutableList().also { it.add(position, getNumberedItem()) }
+    fun addRandomPosition(): List<NumberItem> {
+        Random.Default.nextInt(curList.size + 1).let { position ->
+            curList.add(position, getNumberedItem())
+            return curList
         }
     }
 
-    fun removeAt(oldList: List<NumberItem>, position: Int): List<NumberItem> {
-        return oldList.toMutableList().also { it.removeAt(position) }
+
+    fun removeAt(position: Int): List<NumberItem> {
+        curList.removeAt(position)
+        return curList
     }
+/*
+    fun getList() : Flow<List<NumberItem>> {
+        return flow<List<NumberItem>> {
+                delay(5000L)
+                emit(getStartNumberedList(15))
+        }
+    }
+*/
 }
+

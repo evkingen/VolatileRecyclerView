@@ -36,8 +36,7 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     private fun updateList(newList: List<NumberItem>) {
         (listViewBinding.volatileRv.adapter as? VolatileListAdapter)?.apply {
             val result = DiffUtil.calculateDiff(DiffUtilsCallback(numberList, newList))
-
-            numberList = newList
+            numberList = newList.toList()
             result.dispatchUpdatesTo(this)
         }
     }
