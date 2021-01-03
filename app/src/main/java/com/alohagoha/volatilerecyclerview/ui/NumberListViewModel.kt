@@ -5,16 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alohagoha.volatilerecyclerview.model.NumberItemGenerator
-import com.alohagoha.volatilerecyclerview.model.entities.OperationState
+import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class NumberListViewModel : ViewModel() {
 
-    private val _numberList: MutableLiveData<OperationState> =
-        MutableLiveData<OperationState>(OperationState())
-    val numberList: LiveData<OperationState> = _numberList
+    private val _numberList: MutableLiveData<List<NumberItem>> =
+        MutableLiveData<List<NumberItem>>(NumberItemGenerator.getStartNumberedList(15))
+    val numberList: LiveData<List<NumberItem>> = _numberList
 
     init {
         viewModelScope.launch {
@@ -26,12 +26,6 @@ class NumberListViewModel : ViewModel() {
             }
         }
     }
-
-    fun insertSomeData() {
-
-    }
-
-    fun getNumbersList() = numberList
 
     fun removeItem(position: Int) {
         numberList.value?.let {

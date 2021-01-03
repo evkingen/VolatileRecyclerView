@@ -5,11 +5,12 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.alohagoha.volatilerecyclerview.databinding.FragmentListBinding
-import com.alohagoha.volatilerecyclerview.model.entities.OperationState
-import com.alohagoha.volatilerecyclerview.model.entities.OperationType
+import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 import com.alohagoha.volatilerecyclerview.ui.NumberListViewModel
+import com.alohagoha.volatilerecyclerview.ui.rv.adapters.DiffUtilsCallback
 import com.alohagoha.volatilerecyclerview.ui.rv.adapters.VolatileListAdapter
 
 class ListFragment : Fragment(R.layout.fragment_list) {
@@ -22,39 +23,22 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _listViewBinding = FragmentListBinding.bind(view)
-        viewModel.numberList.observe(viewLifecycleOwner, ::reduce)
+        viewModel.numberList.observe(viewLifecycleOwner, ::updateList)
     }
 
     override fun onStart() {
         super.onStart()
         initRv()
 
-        viewModel.insertSomeData()
+//        viewModel.insertSomeData()
     }
 
-    private fun reduce(state: OperationState) {
+    private fun updateList(newList: List<NumberItem>) {
         (listViewBinding.volatileRv.adapter as? VolatileListAdapter)?.apply {
-            if (numberList.isNotEmpty() && numberList != state.listItem) {
+            val result = DiffUtil.calculateDiff(DiffUtilsCallback(numberList, newList))
 
-                numberList = state.listItem
-                when (state.operation) {
-                    OperationType.REMOVE -> {
-                        notifyItemRemoved(state.position)
-                    }
-                    OperationType.ADD -> {
-                        //notifyDataSetChanged()
-                        notifyItemInserted(state.position)
-                    }
-                    OperationType.NOTHING -> {
-                        notifyDataSetChanged()
-                    }
-                }
-            } else {
-
-
-                numberList = state.listItem
-                notifyDataSetChanged()
-            }
+            numberList = newList
+            result.dispatchUpdatesTo(this)
         }
     }
 

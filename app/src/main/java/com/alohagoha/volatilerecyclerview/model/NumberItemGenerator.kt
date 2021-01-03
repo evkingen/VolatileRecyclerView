@@ -1,8 +1,6 @@
 package com.alohagoha.volatilerecyclerview.model
 
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
-import com.alohagoha.volatilerecyclerview.model.entities.OperationState
-import com.alohagoha.volatilerecyclerview.model.entities.OperationType
 import kotlin.random.Random
 
 object NumberItemGenerator {
@@ -12,18 +10,15 @@ object NumberItemGenerator {
     fun getStartNumberedList(size: Int): List<NumberItem> =
         List(size) { getNumberedItem() }
 
-    fun getStartState(size: Int): OperationState = OperationState(getStartNumberedList(15))
+//    fun getStartState(size: Int): OperationState = OperationState(getStartNumberedList(15))
 
-    fun addRandomPosition(state: OperationState): OperationState {
-        Random.Default.nextInt(state.listItem.size + 1).let { position ->
-            val newList =
-                state.listItem.toMutableList().also { it.add(position, getNumberedItem()) }
-            return OperationState(newList, position, OperationType.ADD)
+    fun addRandomPosition(oldList: List<NumberItem>): List<NumberItem> {
+        Random.Default.nextInt(oldList.size + 1).let { position ->
+            return oldList.toMutableList().also { it.add(position, getNumberedItem()) }
         }
     }
 
-    fun removeAt(state: OperationState, position: Int): OperationState {
-        val newList = state.listItem.toMutableList().also { it.removeAt(position) }
-        return OperationState(newList, position, OperationType.REMOVE)
+    fun removeAt(oldList: List<NumberItem>, position: Int): List<NumberItem> {
+        return oldList.toMutableList().also { it.removeAt(position) }
     }
 }
