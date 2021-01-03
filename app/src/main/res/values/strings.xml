@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">VolatileRecyclerView</string>
+    <string name="cardview_btn_descr">delete card button</string>
 </resources>

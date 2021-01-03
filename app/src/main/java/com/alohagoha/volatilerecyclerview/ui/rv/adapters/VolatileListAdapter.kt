@@ -29,7 +29,7 @@ class VolatileListAdapter(
     inner class NumberViewHolder(val item: ViewHolderVolatileBinding) :
         RecyclerView.ViewHolder(item.root) {
         init {
-            item.root.setOnClickListener {
+            item.deleteIv.setOnClickListener {
                 if (adapterPosition != RecyclerView.NO_POSITION) {
                     clickListener.onClick(adapterPosition)
                 }
