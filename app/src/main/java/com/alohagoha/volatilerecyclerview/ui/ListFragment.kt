@@ -1,4 +1,4 @@
-package com.alohagoha.volatilerecyclerview
+package com.alohagoha.volatilerecyclerview.ui
 
 import android.os.Bundle
 import android.view.View
@@ -7,9 +7,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
+import com.alohagoha.volatilerecyclerview.R
 import com.alohagoha.volatilerecyclerview.databinding.FragmentListBinding
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
-import com.alohagoha.volatilerecyclerview.ui.NumberListViewModel
 import com.alohagoha.volatilerecyclerview.ui.rv.adapters.DiffUtilsCallback
 import com.alohagoha.volatilerecyclerview.ui.rv.adapters.VolatileListAdapter
 
@@ -29,8 +29,6 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     override fun onStart() {
         super.onStart()
         initRv()
-
-//        viewModel.insertSomeData()
     }
 
     private fun updateList(newList: List<NumberItem>) {

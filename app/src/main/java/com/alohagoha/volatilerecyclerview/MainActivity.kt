@@ -3,16 +3,8 @@ package com.alohagoha.volatilerecyclerview
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
+import com.alohagoha.volatilerecyclerview.ui.ListFragment
 
-//todo
-/*
--Оформить в гите
--сделать ветку и попробовать через дифутилс и через ЛистАдаптер
--поизучать MVI
--поизучать интерактор и репозиторий
--разобраться где хранить бизнес-модель
--сделать задание со звездочкой
- */
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
