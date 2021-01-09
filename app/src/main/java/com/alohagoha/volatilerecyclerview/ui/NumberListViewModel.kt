@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class NumberListViewModel(
     private val repo: INumberRepo = NumberRepo(
         mutableListOf(),
-        mutableListOf()
+        sortedSetOf()
     )
 ) : ViewModel() {
     private val _numberList: MutableLiveData<List<NumberItem>> =

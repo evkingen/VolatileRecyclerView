@@ -4,18 +4,28 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import com.alohagoha.volatilerecyclerview.R
 import com.alohagoha.volatilerecyclerview.databinding.FragmentListBinding
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
+import com.alohagoha.volatilerecyclerview.model.repositories.NumberRepo
 import com.alohagoha.volatilerecyclerview.ui.rv.adapters.DiffUtilsCallback
 import com.alohagoha.volatilerecyclerview.ui.rv.adapters.VolatileListAdapter
 
 class ListFragment : Fragment(R.layout.fragment_list) {
+    @Suppress("UNCHECKED_CAST")
+    private val viewModel: NumberListViewModel by viewModels(factoryProducer = {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return NumberListViewModel(NumberRepo(mutableListOf(), sortedSetOf())) as T
+            }
+        }
+    })
 
-    private val viewModel: NumberListViewModel by viewModels()
     private var _listViewBinding: FragmentListBinding? = null
     private val listViewBinding
         get() = _listViewBinding!!
@@ -23,11 +33,11 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _listViewBinding = FragmentListBinding.bind(view)
-        viewModel.numberList.observe(viewLifecycleOwner, ::updateList)
     }
 
     override fun onStart() {
         super.onStart()
+        viewModel.numberList.observe(viewLifecycleOwner, ::updateList)
         initRv()
     }
 
