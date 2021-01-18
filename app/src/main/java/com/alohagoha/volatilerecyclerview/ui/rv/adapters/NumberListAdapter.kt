@@ -2,23 +2,29 @@ package com.alohagoha.volatilerecyclerview.ui.rv.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.alohagoha.volatilerecyclerview.databinding.ViewHolderVolatileBinding
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 
-class VolatileListAdapter(
-    var numberList: List<NumberItem>,
-    private val clickListener: AdapterOnClickListener
-) :
-    RecyclerView.Adapter<VolatileListAdapter.NumberViewHolder>() {
+class NumberListAdapter(
+        var numberList: List<NumberItem>,
+        private val clickListener: AdapterOnClickListener
+) : RecyclerView.Adapter<NumberListAdapter.NumberViewHolder>() {
 
-    fun getItemView(position: Int) = numberList[position]
+    fun updateList(newList: List<NumberItem>) {
+        val result = DiffUtil.calculateDiff(DiffUtilsCallback(numberList, newList))
+        numberList = newList.toList()
+        result.dispatchUpdatesTo(this)
+    }
+
+    private fun getNumberItem(position: Int) = numberList[position]
 
     override fun getItemCount(): Int = numberList.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NumberViewHolder {
         val itemBinding =
-            ViewHolderVolatileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                ViewHolderVolatileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return NumberViewHolder(itemBinding)
     }
 
@@ -27,17 +33,16 @@ class VolatileListAdapter(
     }
 
     inner class NumberViewHolder(val item: ViewHolderVolatileBinding) :
-        RecyclerView.ViewHolder(item.root) {
+            RecyclerView.ViewHolder(item.root) {
         init {
             item.deleteIv.setOnClickListener {
-                if (adapterPosition != RecyclerView.NO_POSITION) {
-                    clickListener.onClick(adapterPosition)
-                }
+                adapterPosition.takeUnless { it == RecyclerView.NO_POSITION }?.let(clickListener::onClick)
             }
         }
 
+
         fun bind(position: Int) {
-            item.numberTv.text = getItemView(position).number.toString()
+            item.numberTv.text = getNumberItem(position).number.toString()
         }
     }
 

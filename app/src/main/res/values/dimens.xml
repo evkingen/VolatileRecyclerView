@@ -2,5 +2,6 @@
 <resources>
     <dimen name="text_card_size">80sp</dimen>
     <dimen name="volatile_card_corner_radius">4dp</dimen>
-    <dimen name="spacing_1x">8dp</dimen>
+    <dimen name="spacing_1x">4dp</dimen>
+    <dimen name="spacing_2x">8dp</dimen>
 </resources>

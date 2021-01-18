@@ -3,57 +3,45 @@ package com.alohagoha.volatilerecyclerview.model.repositories
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.random.Random
 
-class NumberRepo(
-    override val activeList: MutableList<NumberItem>,
-    override val backupPool: SortedSet<NumberItem>
-) : INumberRepo {
-    private var acc = 0
+class NumberRepo(size: Int = 15) : INumberRepo {
 
-    private fun getNumberedItem() = NumberItem(acc++)
+    private val synchronizeObj = Mutex()
+    private val nextNumber = AtomicInteger()
+    override val stateNumbers: MutableStateFlow<List<NumberItem>> = MutableStateFlow(List(size) { createNextNumberItem() })
+    private val backupPool: SortedSet<NumberItem> = sortedSetOf()
 
-    override fun initStartList(size: Int): List<NumberItem> {
-        synchronized(activeList) {
-            activeList.clear()
-            activeList.addAll(List(size) { getNumberedItem() })
-            return activeList
+    private fun updateList(newList: List<NumberItem>) {
+        stateNumbers.value = newList
+    }
+
+    private fun createNextNumberItem(): NumberItem {
+        return NumberItem(nextNumber.getAndIncrement())
+    }
+
+    override suspend fun removeItem(position: Int) = withContext(Dispatchers.Default) {
+        synchronizeObj.withLock {
+            val newList = stateNumbers.value.toMutableList()
+            backupPool.add(newList.removeAt(position))
+            updateList(newList)
         }
     }
 
-    override fun getNumbersList(): Flow<List<NumberItem>> = flow {
-        while (true) {
-            delay(5000L)
-            addToRandomPositionItem()
-            emit(activeList)
-        }
-    }.flowOn(Dispatchers.Default)
-
-
-    override fun removeItem(position: Int): List<NumberItem> {
-        synchronized(activeList) {
-            activeList.removeAt(position).also {
-                synchronized(backupPool) {
-                    backupPool.add(it)
-                }
-            }
-        }
-        return activeList
-    }
-
-    private fun addToRandomPositionItem() {
-        synchronized(activeList) {
-            Random.Default.nextInt(activeList.size + 1).let { index ->
-                synchronized(backupPool) {
-                    val item = if (backupPool.isEmpty()) getNumberedItem() else backupPool.first()
-                        .also { backupPool.remove(it) }
-                    activeList.add(index, item)
-                }
-            }
+    override suspend fun addItemToRandomPosition() = withContext(Dispatchers.Default) {
+        delay(5000L)
+        synchronizeObj.withLock {
+            val item = backupPool.takeUnless { it.isEmpty() }?.first()?.let { it.also { backupPool.remove(it) } }
+                    ?: createNextNumberItem()
+            val newList = stateNumbers.value.toMutableList()
+            newList.add(Random.Default.nextInt(stateNumbers.value.size + 1), item)
+            updateList(newList)
         }
     }
 

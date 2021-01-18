@@ -3,8 +3,7 @@ package com.alohagoha.volatilerecyclerview.ui.rv.adapters
 import androidx.recyclerview.widget.DiffUtil
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 
-class DiffUtilsCallback(val oldList: List<NumberItem>, val newList: List<NumberItem>) :
-    DiffUtil.Callback() {
+class DiffUtilsCallback(private val oldList: List<NumberItem>, private val newList: List<NumberItem>) : DiffUtil.Callback() {
     override fun getOldListSize(): Int = oldList.size
 
     override fun getNewListSize(): Int = newList.size

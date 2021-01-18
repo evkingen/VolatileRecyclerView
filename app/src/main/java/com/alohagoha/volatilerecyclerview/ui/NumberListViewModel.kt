@@ -1,35 +1,37 @@
 package com.alohagoha.volatilerecyclerview.ui
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alohagoha.volatilerecyclerview.model.entities.NumberItem
 import com.alohagoha.volatilerecyclerview.model.repositories.INumberRepo
 import com.alohagoha.volatilerecyclerview.model.repositories.NumberRepo
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class NumberListViewModel(
-    private val repo: INumberRepo = NumberRepo(
-        mutableListOf(),
-        sortedSetOf()
-    )
-) : ViewModel() {
-    private val _numberList: MutableLiveData<List<NumberItem>> =
-        MutableLiveData<List<NumberItem>>()
-    val numberList: LiveData<List<NumberItem>>
-        get() = _numberList
+        private val repo: INumberRepo = NumberRepo()
+) : ViewModel(), INumberListViewModel {
+    override val numberList: MutableLiveData<List<NumberItem>> = MutableLiveData<List<NumberItem>>()
 
     init {
-        _numberList.value = repo.initStartList(15)
         viewModelScope.launch {
-            repo.getNumbersList().collect { _numberList.value = it }
+            while (true) {
+                repo.addItemToRandomPosition()
+            }
         }
+
+        repo.stateNumbers.onEach {
+            numberList.value = it
+        }.launchIn(viewModelScope)
+
     }
 
-    fun removeItem(position: Int) {
-        _numberList.value = repo.removeItem(position)
+    override fun removeItem(position: Int) {
+        viewModelScope.launch {
+            repo.removeItem(position)
+        }
     }
 
 }
